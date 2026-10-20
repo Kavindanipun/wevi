@@ -1,0 +1,74 @@
+/* ==========================================================
+   WEVI – Scroll parallax story section (.px)
+   Tall wrapper + sticky stage; JS writes --p (0 → 1) while scrolling.
+   ========================================================== */
+.px{position:relative;height:300vh;background:#fff;color:#101010;font-family:Inter,Arial,Helvetica,sans-serif;--p:0}
+.px *,.px *::before,.px *::after{box-sizing:border-box}
+.px__stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;display:flex;flex-direction:column;align-items:center}
+
+/* soft background glow – slowest layer */
+.px__glow{position:absolute;left:50%;top:62%;width:min(120vw,1500px);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,rgba(41,121,255,.16) 0%,rgba(41,121,255,.06) 38%,transparent 66%);
+  transform:translate3d(-50%,calc(-50% + var(--p)*-6vh),0) scale(calc(.9 + var(--p)*.35));will-change:transform}
+
+/* huge outline word – moves the opposite way to the branch */
+.px__word{position:absolute;left:0;top:50%;white-space:nowrap;font-size:clamp(150px,30vw,520px);font-weight:900;letter-spacing:-.07em;line-height:1;
+  color:transparent;-webkit-text-stroke:1.5px rgba(16,16,16,.07);user-select:none;pointer-events:none;
+  transform:translate3d(calc(8vw - var(--p)*38vw),-50%,0);will-change:transform}
+
+/* branch image – main layer */
+.px__media{mix-blend-mode:multiply;position:absolute;left:50%;bottom:clamp(2vh,5vh,7vh);margin:0;will-change:transform;
+  transform:translate3d(calc(-50% + var(--tx,0px)),calc(var(--p)*-3vh),0) scale(calc(1 + var(--p)*.12) )}
+.px__media img{display:block;height:clamp(230px,52vh,640px);width:auto;max-width:none;user-select:none;-webkit-user-drag:none}
+
+/* soften the hard image edges where the branch leaves the frame */
+.px__media img{
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 10%,#000 90%,transparent);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 10%,#000 90%,transparent);
+  mask-composite:intersect;
+}
+
+/* captions (cross-fade) */
+.px__captions{position:relative;z-index:3;width:min(92vw,880px);height:clamp(190px,34vh,330px);margin-top:clamp(40px,9vh,110px);text-align:center}
+.px-cap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0 8px;
+  opacity:0;transform:translate3d(0,24px,0);will-change:opacity,transform}
+.px-cap__eyebrow{font-family:Georgia,serif;font-size:12px;letter-spacing:.07em;text-transform:uppercase;margin:0 0 16px}
+.px-cap__title{margin:0 0 16px;font-size:clamp(34px,6vw,82px);line-height:.98;letter-spacing:-.065em;font-weight:850}
+.px-cap__title span{color:#a3a3a8}
+.px-cap__text{margin:0;max-width:520px;color:#8a8a8f;font-size:clamp(14px,1.4vw,17px);line-height:1.55}
+
+/* floating spec chips – fastest layer (in front) */
+.px__chip{position:absolute;z-index:4;display:flex;flex-direction:column;gap:2px;padding:12px 18px;border-radius:18px;background:rgba(255,255,255,.82);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 0 0 1px rgba(0,0,0,.06),0 16px 34px -18px rgba(0,0,0,.35);
+  will-change:transform;transform:translate3d(0,calc(var(--p)*var(--sp,-120px)),0)}
+.px__chip strong{font-size:clamp(20px,2.4vw,30px);letter-spacing:-.05em;line-height:1}
+.px__chip span{font-size:11px;color:#8a8a8f;letter-spacing:.02em}
+.px__chip--a{left:7%;bottom:38%;--sp:-170px}
+.px__chip--b{right:8%;bottom:48%;--sp:-90px}
+.px__chip--c{right:16%;bottom:14%;--sp:-210px}
+
+/* progress dots */
+.px__dots{position:absolute;z-index:5;right:22px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px}
+.px__dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,.18);transition:background .3s,transform .3s}
+.px__dots i.on{background:#101010;transform:scale(1.5)}
+
+@media(max-width:700px){
+  .px{height:260vh}
+  .px__chip--a{left:5%;bottom:36%}
+  .px__chip--b{display:none}
+  .px__chip--c{right:5%;bottom:11%}
+  .px__chip{padding:9px 13px;border-radius:14px}
+  .px__dots{right:10px}
+  .px-cap__eyebrow{font-size:10px}
+}
+/* no-motion / no-JS: show everything stacked, nothing pinned */
+@media(prefers-reduced-motion:reduce){
+  .px{height:auto}
+  .px__stage{position:relative;height:auto;padding:70px 0 40px}
+  .px__captions{height:auto}
+  .px-cap{position:relative;opacity:1;transform:none;margin-bottom:40px}
+  .px__media{position:relative;left:auto;bottom:auto;transform:none;max-width:100%;overflow:hidden}
+  .px__media img{width:100%;height:auto}
+  .px__word,.px__glow,.px__chip,.px__dots{display:none}
+}
